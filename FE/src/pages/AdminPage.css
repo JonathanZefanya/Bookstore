@@ -1,0 +1,450 @@
+.admin-page {
+  padding: 48px 0 80px;
+  min-height: calc(100vh - 68px);
+}
+
+.admin-header {
+  margin-bottom: 32px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.admin-title {
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  letter-spacing: -1px;
+  margin-bottom: 8px;
+}
+
+.admin-subtitle {
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+
+/* Tabs */
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px;
+  margin-bottom: 32px;
+  width: fit-content;
+}
+
+.admin-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-tab:hover {
+  color: var(--text-heading);
+  background: var(--bg-hover);
+}
+
+.admin-tab.active {
+  background: var(--primary-light);
+  color: #818cf8;
+  border: 1px solid var(--primary-border);
+}
+
+/* Panel */
+.settings-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+}
+
+.panel-header {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-header h2 {
+  font-size: 1.4rem;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+
+.panel-header p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.panel-actions {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Grid layouts */
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.seo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.seo-section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Fields */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.field-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.2px;
+}
+
+.field-input {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text-heading);
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.field-input::placeholder { color: var(--text-muted); }
+
+.field-textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.6;
+}
+
+.field-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Color */
+.color-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.color-picker {
+  width: 48px;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 2px;
+  background: var(--bg-elevated);
+  flex-shrink: 0;
+}
+
+.color-text { flex: 1; font-family: 'JetBrains Mono', monospace; }
+
+.color-swatch {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  flex-shrink: 0;
+}
+
+/* Upload zone */
+.upload-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.upload-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.upload-zone {
+  position: relative;
+  display: block;
+  border: 2px dashed var(--border-light);
+  border-radius: 10px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  min-height: 120px;
+}
+
+.upload-zone:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.upload-zone.uploading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px;
+  min-height: 120px;
+}
+
+.upload-icon { font-size: 28px; }
+
+.upload-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.upload-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.upload-preview-img {
+  width: 100%;
+  height: 160px;
+  object-fit: contain;
+  display: block;
+}
+
+.upload-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.upload-zone:hover .upload-overlay { opacity: 1; }
+
+.upload-hidden {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Books Panel */
+.books-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* Book Form */
+.book-form-panel {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.book-form-title {
+  font-size: 1.1rem;
+  margin-bottom: 24px;
+}
+
+.book-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 24px;
+}
+
+.field-full {
+  grid-column: 1 / -1;
+}
+
+.book-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+/* Books List */
+.books-list-loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+}
+
+.books-list-error {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 8px;
+  color: #f87171;
+  font-size: 14px;
+}
+
+.books-list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+  text-align: center;
+  font-size: 14px;
+}
+.books-list-empty span { font-size: 40px; }
+
+.books-admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.book-admin-row {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  transition: border-color 0.2s;
+}
+
+.book-admin-row:hover { border-color: var(--border-light); }
+
+.book-admin-cover {
+  width: 56px;
+  height: 72px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-hover);
+  flex-shrink: 0;
+}
+
+.book-admin-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.book-admin-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.book-admin-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.book-admin-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-admin-author {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.book-admin-meta {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.book-slug-chip {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-family: monospace;
+}
+
+.book-admin-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .settings-grid, .seo-grid { grid-template-columns: 1fr; gap: 0; }
+  .admin-tabs { width: 100%; }
+  .admin-tab { flex: 1; justify-content: center; }
+}
+
+@media (max-width: 768px) {
+  .settings-panel { padding: 20px; }
+  .book-form-grid { grid-template-columns: 1fr; }
+  .book-admin-row { grid-template-columns: 48px 1fr; }
+  .book-admin-actions { grid-column: 1 / -1; justify-content: flex-end; }
+}

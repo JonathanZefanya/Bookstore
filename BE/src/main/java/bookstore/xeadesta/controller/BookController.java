@@ -3,10 +3,13 @@ package bookstore.xeadesta.controller;
 import bookstore.xeadesta.entity.Book;
 import bookstore.xeadesta.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -18,64 +21,54 @@ public class BookController {
     private BookService bookService;
     
     @GetMapping
-    public ResponseEntity<List<Book>> getAllBooks() {
-        try {
-            List<Book> books = bookService.getAllBooks();
-            return ResponseEntity.ok(books);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<?> getAllBooks() {
+        List<Book> books = bookService.getAllBooks();
+        return ResponseEntity.ok(books);
     }
     
     @GetMapping("/{id}")
     public ResponseEntity<?> getBookById(@PathVariable Long id) {
-        try {
-            Optional<Book> book = bookService.getBookById(id);
-            return book.map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.notFound().build());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error fetching book: " + e.getMessage());
+        Optional<Book> book = bookService.getBookById(id);
+        if (book.isEmpty()) {
+            return notFound("Book with ID " + id + " not found");
         }
+        return ResponseEntity.ok(book.get());
     }
     
     @GetMapping("/slug/{slug}")
     public ResponseEntity<?> getBookBySlug(@PathVariable String slug) {
-        try {
-            Optional<Book> book = bookService.getBookBySlug(slug);
-            return book.map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.notFound().build());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error fetching book: " + e.getMessage());
+        Optional<Book> book = bookService.getBookBySlug(slug);
+        if (book.isEmpty()) {
+            return notFound("Book '" + slug + "' not found");
         }
+        return ResponseEntity.ok(book.get());
     }
     
     @PostMapping
     public ResponseEntity<?> createBook(@RequestBody Book book) {
-        try {
-            Book created = bookService.createBook(book);
-            return ResponseEntity.ok(created);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error creating book: " + e.getMessage());
-        }
+        Book created = bookService.createBook(book);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
     
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBook(@PathVariable Long id, @RequestBody Book book) {
-        try {
-            Book updated = bookService.updateBook(id, book);
-            return ResponseEntity.ok(updated);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error updating book: " + e.getMessage());
-        }
+        Book updated = bookService.updateBook(id, book);
+        return ResponseEntity.ok(updated);
     }
     
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBook(@PathVariable Long id) {
-        try {
-            bookService.deleteBook(id);
-            return ResponseEntity.ok("Book deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error deleting book: " + e.getMessage());
-        }
+        bookService.deleteBook(id);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Book deleted successfully");
+        return ResponseEntity.ok(response);
+    }
+    
+    private ResponseEntity<Map<String, Object>> notFound(String message) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", 404);
+        response.put("error", "Not Found");
+        response.put("message", message);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 }

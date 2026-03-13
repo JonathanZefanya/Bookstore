@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
-interface Settings {
+export interface Settings {
   id?: number;
-  siteName: string;
+  siteName?: string;
   siteLogo?: string;
   siteFavicon?: string;
   themeColor?: string;
@@ -34,29 +34,36 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 
 const defaultSettings: Settings = {
   siteName: 'Bookstore',
-  themeColor: '#000000',
+  themeColor: '#4f46e5',
 };
+
+function getErrorMessage(err: unknown): string {
+  if (err instanceof AxiosError) {
+    const data = err.response?.data;
+    if (data?.message) return data.message;
+    if (typeof data === 'string') return data;
+    return err.message;
+  }
+  if (err instanceof Error) return err.message;
+  return 'An unknown error occurred';
+}
 
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [settings, setSettings] = useState<Settings | null>(defaultSettings);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8086/api';
 
   const fetchSettings = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`${API_BASE_URL}/settings`, {
-        timeout: 5000,
-      });
+      const response = await axios.get(`${API_BASE_URL}/settings`, { timeout: 8000 });
       setSettings(response.data || defaultSettings);
     } catch (err) {
-      // Use default settings if API is unavailable
       setSettings(defaultSettings);
-      const message = err instanceof Error ? err.message : 'Failed to fetch settings';
-      console.warn('Using default settings:', message);
+      console.warn('Using default settings. Backend may be offline:', getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -70,35 +77,33 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     await fetchSettings();
   };
 
-  const updateSettings = async (newSettings: Partial<Settings>) => {
+  const updateSettings = async (newSettings: Partial<Settings>): Promise<Settings> => {
     try {
       setError(null);
       const response = await axios.put(`${API_BASE_URL}/settings`, newSettings);
       setSettings(response.data);
       return response.data;
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to update settings';
+      const message = getErrorMessage(err);
       setError(message);
-      throw err;
+      throw new Error(message);
     }
   };
 
-  const uploadFile = async (file: File, endpoint: string) => {
+  const uploadFile = async (file: File, endpoint: string): Promise<Settings> => {
     try {
       setError(null);
       const formData = new FormData();
       formData.append('file', file);
       const response = await axios.post(`${API_BASE_URL}/settings/${endpoint}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       setSettings(response.data);
       return response.data;
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'File upload failed';
+      const message = getErrorMessage(err);
       setError(message);
-      throw err;
+      throw new Error(message);
     }
   };
 
@@ -106,19 +111,8 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   const uploadFavicon = (file: File) => uploadFile(file, 'upload-favicon');
   const uploadOgImage = (file: File) => uploadFile(file, 'upload-og-image');
 
-  const value: SettingsContextType = {
-    settings,
-    loading,
-    error,
-    refreshSettings,
-    updateSettings,
-    uploadLogo,
-    uploadFavicon,
-    uploadOgImage,
-  };
-
   return (
-    <SettingsContext.Provider value={value}>
+    <SettingsContext.Provider value={{ settings, loading, error, refreshSettings, updateSettings, uploadLogo, uploadFavicon, uploadOgImage }}>
       {children}
     </SettingsContext.Provider>
   );
@@ -126,8 +120,6 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
 
 export const useSettings = () => {
   const context = useContext(SettingsContext);
-  if (context === undefined) {
-    throw new Error('useSettings must be used within a SettingsProvider');
-  }
+  if (!context) throw new Error('useSettings must be used within a SettingsProvider');
   return context;
 };

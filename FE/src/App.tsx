@@ -1,50 +1,39 @@
-import { useState } from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { SettingsProvider } from './contexts/SettingsContext'
-import SEOHead from './components/SEOHead'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
-
-function AppContent() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <SEOHead />
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-    </>
-  )
-}
+import { ToastProvider } from './contexts/ToastContext'
+import Navbar from './components/Navbar'
+import Footer from './components/Footer'
+import HomePage from './pages/HomePage'
+import BooksPage from './pages/BooksPage'
+import BookDetailPage from './pages/BookDetailPage'
+import AdminPage from './pages/AdminPage'
+import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
   return (
     <HelmetProvider>
       <SettingsProvider>
-        <AppContent />
+        <ToastProvider>
+          <BrowserRouter>
+            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+              <Navbar />
+              <main style={{ flex: 1 }}>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/books" element={<BooksPage />} />
+                  <Route path="/books/:slug" element={<BookDetailPage />} />
+                  <Route path="/admin" element={<AdminPage />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+          </BrowserRouter>
+        </ToastProvider>
       </SettingsProvider>
     </HelmetProvider>
   )
 }
 
 export default App
-

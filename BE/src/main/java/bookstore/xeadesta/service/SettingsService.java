@@ -20,7 +20,13 @@ public class SettingsService {
     
     public Settings getSettings() {
         Optional<Settings> settings = settingsRepository.findAll().stream().findFirst();
-        return settings.orElse(new Settings());
+        if (settings.isEmpty()) {
+            Settings defaultSettings = new Settings();
+            defaultSettings.setSiteName("Bookstore");
+            defaultSettings.setThemeColor("#4f46e5");
+            return settingsRepository.save(defaultSettings);
+        }
+        return settings.get();
     }
     
     public Settings updateSettings(Settings settingsUpdate) {
@@ -28,10 +34,23 @@ public class SettingsService {
         Settings settings = existing.orElse(new Settings());
         
         if (settingsUpdate.getSiteName() != null) {
-            settings.setSiteName(settingsUpdate.getSiteName());
+            String name = settingsUpdate.getSiteName().trim();
+            if (name.isEmpty()) {
+                throw new IllegalArgumentException("Site name cannot be empty");
+            }
+            settings.setSiteName(name);
         }
+        
+        if (settings.getSiteName() == null || settings.getSiteName().isBlank()) {
+            settings.setSiteName("Bookstore");
+        }
+        
         if (settingsUpdate.getThemeColor() != null) {
-            settings.setThemeColor(settingsUpdate.getThemeColor());
+            String color = settingsUpdate.getThemeColor().trim();
+            if (!color.isEmpty() && !color.matches("^#[0-9A-Fa-f]{6}$")) {
+                throw new IllegalArgumentException("Invalid theme color format. Use hex like #4f46e5");
+            }
+            settings.setThemeColor(color);
         }
         if (settingsUpdate.getFooterText() != null) {
             settings.setFooterText(settingsUpdate.getFooterText());
@@ -59,59 +78,54 @@ public class SettingsService {
     }
     
     public Settings uploadLogo(MultipartFile file) throws IOException {
+        validateFile(file);
         String fileName = fileUploadService.uploadFile(file);
-        Optional<Settings> existing = settingsRepository.findAll().stream().findFirst();
-        Settings settings = existing.orElse(new Settings());
-        
-        // Delete old logo if exists
-        if (settings.getSiteLogo() != null) {
-            try {
-                fileUploadService.deleteFile(settings.getSiteLogo());
-            } catch (IOException e) {
-                // Log error but continue
-                e.printStackTrace();
-            }
-        }
-        
+        Settings settings = getOrCreateSettings();
+        deleteFileIfExists(settings.getSiteLogo());
         settings.setSiteLogo(fileName);
         return settingsRepository.save(settings);
     }
     
     public Settings uploadFavicon(MultipartFile file) throws IOException {
+        validateFile(file);
         String fileName = fileUploadService.uploadFile(file);
-        Optional<Settings> existing = settingsRepository.findAll().stream().findFirst();
-        Settings settings = existing.orElse(new Settings());
-        
-        // Delete old favicon if exists
-        if (settings.getSiteFavicon() != null) {
-            try {
-                fileUploadService.deleteFile(settings.getSiteFavicon());
-            } catch (IOException e) {
-                // Log error but continue
-                e.printStackTrace();
-            }
-        }
-        
+        Settings settings = getOrCreateSettings();
+        deleteFileIfExists(settings.getSiteFavicon());
         settings.setSiteFavicon(fileName);
         return settingsRepository.save(settings);
     }
     
     public Settings uploadOgImage(MultipartFile file) throws IOException {
+        validateFile(file);
         String fileName = fileUploadService.uploadFile(file);
-        Optional<Settings> existing = settingsRepository.findAll().stream().findFirst();
-        Settings settings = existing.orElse(new Settings());
-        
-        // Delete old og image if exists
-        if (settings.getOgImage() != null) {
-            try {
-                fileUploadService.deleteFile(settings.getOgImage());
-            } catch (IOException e) {
-                // Log error but continue
-                e.printStackTrace();
-            }
-        }
-        
+        Settings settings = getOrCreateSettings();
+        deleteFileIfExists(settings.getOgImage());
         settings.setOgImage(fileName);
         return settingsRepository.save(settings);
+    }
+    
+    private void validateFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("No file provided or file is empty");
+        }
+    }
+    
+    private Settings getOrCreateSettings() {
+        Optional<Settings> existing = settingsRepository.findAll().stream().findFirst();
+        Settings settings = existing.orElse(new Settings());
+        if (settings.getSiteName() == null || settings.getSiteName().isBlank()) {
+            settings.setSiteName("Bookstore");
+        }
+        return settings;
+    }
+    
+    private void deleteFileIfExists(String fileName) {
+        if (fileName != null && !fileName.isBlank()) {
+            try {
+                fileUploadService.deleteFile(fileName);
+            } catch (IOException e) {
+                System.err.println("Warning: Could not delete old file: " + fileName + " - " + e.getMessage());
+            }
+        }
     }
 }

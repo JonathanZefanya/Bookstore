@@ -20,26 +20,57 @@ public class BookService {
     }
     
     public Optional<Book> getBookById(Long id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Invalid book ID");
+        }
         return bookRepository.findById(id);
     }
     
     public Optional<Book> getBookBySlug(String slug) {
+        if (slug == null || slug.isBlank()) {
+            throw new IllegalArgumentException("Invalid book slug");
+        }
         return bookRepository.findBySlug(slug);
     }
     
     public Book createBook(Book book) {
-        if (book.getSlug() == null || book.getSlug().isEmpty()) {
-            book.setSlug(SlugUtil.toSlug(book.getTitle()));
+        if (book.getTitle() == null || book.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Book title is required");
+        }
+        if (book.getSlug() == null || book.getSlug().isBlank()) {
+            String generatedSlug = SlugUtil.toSlug(book.getTitle());
+            // Ensure slug uniqueness
+            String uniqueSlug = generatedSlug;
+            int counter = 1;
+            while (bookRepository.findBySlug(uniqueSlug).isPresent()) {
+                uniqueSlug = generatedSlug + "-" + counter++;
+            }
+            book.setSlug(uniqueSlug);
+        }
+        if (book.getPrice() != null && book.getPrice() < 0) {
+            throw new IllegalArgumentException("Price cannot be negative");
         }
         return bookRepository.save(book);
     }
     
     public Book updateBook(Long id, Book bookUpdate) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Invalid book ID");
+        }
         return bookRepository.findById(id).map(book -> {
-            if (bookUpdate.getTitle() != null) {
+            if (bookUpdate.getTitle() != null && !bookUpdate.getTitle().isBlank()) {
                 book.setTitle(bookUpdate.getTitle());
-                if (bookUpdate.getSlug() == null || bookUpdate.getSlug().isEmpty()) {
-                    book.setSlug(SlugUtil.toSlug(bookUpdate.getTitle()));
+                if (bookUpdate.getSlug() == null || bookUpdate.getSlug().isBlank()) {
+                    String generatedSlug = SlugUtil.toSlug(bookUpdate.getTitle());
+                    String uniqueSlug = generatedSlug;
+                    int counter = 1;
+                    while (bookRepository.findBySlug(uniqueSlug).isPresent() &&
+                           !bookRepository.findBySlug(uniqueSlug).get().getId().equals(id)) {
+                        uniqueSlug = generatedSlug + "-" + counter++;
+                    }
+                    book.setSlug(uniqueSlug);
+                } else {
+                    book.setSlug(bookUpdate.getSlug());
                 }
             }
             if (bookUpdate.getDescription() != null) {
@@ -55,6 +86,9 @@ public class BookService {
                 book.setIsbn(bookUpdate.getIsbn());
             }
             if (bookUpdate.getPrice() != null) {
+                if (bookUpdate.getPrice() < 0) {
+                    throw new IllegalArgumentException("Price cannot be negative");
+                }
                 book.setPrice(bookUpdate.getPrice());
             }
             if (bookUpdate.getPublishYear() != null) {
@@ -64,10 +98,16 @@ public class BookService {
                 book.setContent(bookUpdate.getContent());
             }
             return bookRepository.save(book);
-        }).orElseThrow(() -> new RuntimeException("Book not found"));
+        }).orElseThrow(() -> new RuntimeException("Book with ID " + id + " not found"));
     }
     
     public void deleteBook(Long id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Invalid book ID");
+        }
+        if (!bookRepository.existsById(id)) {
+            throw new RuntimeException("Book with ID " + id + " not found");
+        }
         bookRepository.deleteById(id);
     }
 }
