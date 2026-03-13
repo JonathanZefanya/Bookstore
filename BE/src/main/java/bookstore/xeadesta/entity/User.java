@@ -1,59 +1,44 @@
 package bookstore.xeadesta.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "books")
+@Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Book {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String title;
+    private String name;
 
-    @Column(unique = true, nullable = false)
-    private String slug;
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @JsonIgnore
+    @Column(nullable = false)
+    private String password;
 
     @Column
-    private String author;
-
-    @Column
-    private String isbn;
+    private String phone;
 
     @Column(columnDefinition = "TEXT")
-    private String description;
+    private String address;
 
-    @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal price = BigDecimal.ZERO;
-
-    @Column
-    private Integer weightGram = 300;
-
-    @Column
-    private Integer publishYear;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
 
     @Column(nullable = false)
-    private Integer stock = 0;
-
-    @Column
-    private String coverImage;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "publisher_id")
-    private Publisher publisher;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "category_id")
-    private Category category;
+    private Boolean isActive = true;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
