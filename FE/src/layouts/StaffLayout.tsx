@@ -46,15 +46,15 @@ const StaffLayout: React.FC = () => {
         ))}
       </nav>
       <div className="p-4 border-t border-gray-100">
-        <div className="flex items-center gap-3 mb-3">
+        <Link to="/staff/profile" className="flex items-center gap-3 mb-3 hover:bg-gray-100 p-2 -mx-2 rounded-lg transition-colors">
           <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center text-amber-700 font-bold text-sm">
             {user?.name?.charAt(0).toUpperCase()}
           </div>
           <div className="overflow-hidden">
-            <p className="text-sm font-semibold truncate">{user?.name}</p>
+            <p className="text-sm font-semibold truncate text-gray-900">{user?.name}</p>
             <p className="text-xs text-amber-600 font-medium">Staff</p>
           </div>
-        </div>
+        </Link>
         <Link to="/" className="text-xs text-gray-400 hover:text-gray-600 block mb-2">← Public Site</Link>
         <button onClick={handleLogout} className="flex items-center gap-2 text-sm text-gray-500 hover:text-red-500 transition-colors">
           <ArrowRightOnRectangleIcon className="w-4 h-4" /> Logout

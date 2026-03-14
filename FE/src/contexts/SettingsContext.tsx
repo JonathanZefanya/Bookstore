@@ -6,9 +6,21 @@ import type { Settings } from '../types';
 interface SettingsContextType {
   settings: Settings | null;
   loading: boolean;
+  formatCurrency: (amount: number) => string;
 }
 
-const SettingsContext = createContext<SettingsContextType>({ settings: null, loading: true });
+const SettingsContext = createContext<SettingsContextType>({ 
+  settings: null, 
+  loading: true,
+  formatCurrency: (amount) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount).replace(/(\s)/g, ' ');
+  }
+});
 
 export const useSettings = () => useContext(SettingsContext);
 
@@ -48,8 +60,23 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
 
 
+  const formatCurrency = (amount: number) => {
+    let currency = (settings?.currency || 'IDR').toUpperCase();
+    let locale = 'id-ID';
+    if (currency === 'USD') locale = 'en-US';
+    if (currency === 'EUR') locale = 'de-DE';
+    if (currency === 'GBP') locale = 'en-GB';
+
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: currency === 'IDR' ? 0 : 2,
+      maximumFractionDigits: currency === 'IDR' ? 0 : 2
+    }).format(amount).replace(/(\s)/g, ' ');
+  };
+
   return (
-    <SettingsContext.Provider value={{ settings, loading }}>
+    <SettingsContext.Provider value={{ settings, loading, formatCurrency }}>
       {settings && (
         <Helmet>
           <title>{settings.metaTitle || settings.siteName || 'Gramedia Bookstore'}</title>

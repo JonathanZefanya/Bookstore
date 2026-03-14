@@ -3,10 +3,13 @@ import { useSearchParams, Link } from 'react-router-dom';
 import type { Book, Category, Publisher, PageResponse } from '../../types';
 import api, { getImageUrl } from '../../api/axios';
 import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { useSettings } from '../../contexts/SettingsContext';
 import { ShoppingCartIcon, MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
 const BooksPage: React.FC = () => {
+  const { formatCurrency } = useSettings();
   const [params, setParams] = useSearchParams();
   const searchParam = params.get('search') || '';
   const categoryParam = params.get('categoryId') || '';
@@ -23,6 +26,7 @@ const BooksPage: React.FC = () => {
   const [mobileFilters, setMobileFilters] = useState(false);
 
   const { addToCart, loading: cartLoading } = useCart();
+  const { isAuthenticated, isStaff, isAdmin } = useAuth();
 
   useEffect(() => {
     Promise.all([
@@ -191,15 +195,17 @@ const BooksPage: React.FC = () => {
                       </Link>
                       <p className="text-sm text-gray-500 line-clamp-1 mb-3">{book.author}</p>
                       <div className="mt-auto flex items-end justify-between">
-                        <span className="font-extrabold text-lg text-gray-900">${book.price.toFixed(2)}</span>
-                        <button
-                          disabled={book.stock === 0 || cartLoading}
-                          onClick={() => addToCart(book.id, 1)}
-                          className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-colors disabled:opacity-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200"
-                          title={book.stock === 0 ? "Out of stock" : "Add to Cart"}
-                        >
-                          <ShoppingCartIcon className="w-4 h-4" />
-                        </button>
+                        <span className="font-extrabold text-lg text-gray-900">{formatCurrency(book.price)}</span>
+                        {(!isAuthenticated || (!isAdmin && !isStaff)) && (
+                          <button
+                            disabled={book.stock === 0 || cartLoading}
+                            onClick={() => addToCart(book.id, 1)}
+                            className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-colors disabled:opacity-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200"
+                            title={book.stock === 0 ? "Out of stock" : "Add to Cart"}
+                          >
+                            <ShoppingCartIcon className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

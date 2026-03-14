@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
-import { TruckIcon, CurrencyDollarIcon, UsersIcon, BookOpenIcon, Cog6ToothIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { TruckIcon, BanknotesIcon, UsersIcon, BookOpenIcon, Cog6ToothIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
-  const { settings } = useSettings();
+  const { formatCurrency } = useSettings();
   const [stats, setStats] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -19,17 +19,9 @@ const AdminDashboard: React.FC = () => {
 
   useEffect(() => {
     fetchStats();
-    const interval = setInterval(fetchStats, 30000); // Poll every 30 seconds
+    const interval = setInterval(fetchStats, 30000);
     return () => clearInterval(interval);
   }, []);
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: settings?.currency || 'USD',
-      minimumFractionDigits: settings?.currency === 'IDR' ? 0 : 2
-    }).format(amount);
-  };
 
   return (
     <div className="space-y-8">
@@ -51,7 +43,7 @@ const AdminDashboard: React.FC = () => {
       {loading ? <div className="animate-pulse space-y-8"><div className="h-32 bg-gray-100 rounded-xl" /><div className="h-64 bg-gray-100 rounded-xl" /></div> : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatCard title="Total Revenue" value={formatCurrency(stats.totalRevenue || 0)} icon={<CurrencyDollarIcon className="w-6 h-6 text-green-600" />} trend="All Time" />
+            <StatCard title="Total Revenue" value={formatCurrency(stats.totalRevenue || 0)} icon={<BanknotesIcon className="w-6 h-6 text-green-600" />} trend="All Time" />
             <StatCard title="Orders Processed" value={stats.totalOrders || 0} icon={<TruckIcon className="w-6 h-6 text-indigo-600" />} trend="System-wide" />
             <StatCard title="Active Users" value="Manage" to="/admin/users" icon={<UsersIcon className="w-6 h-6 text-blue-600" />} isLink />
             <StatCard title="Global Settings" value="Configure" to="/admin/settings" icon={<Cog6ToothIcon className="w-6 h-6 text-slate-600" />} isLink />

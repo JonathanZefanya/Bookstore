@@ -75,17 +75,17 @@ function AppRoutes() {
       <Route path="register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
 
       {/* User Dashboard */}
-      <Route path="dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+      <Route path="dashboard" element={<RoleRoute roles={['USER']}><DashboardLayout /></RoleRoute>}>
         <Route index element={<UserDashboard />} />
         <Route path="orders" element={<MyOrders />} />
         <Route path="orders/:id" element={<OrderDetail />} />
         <Route path="profile" element={<MyProfile />} />
       </Route>
-      <Route path="cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
-      <Route path="checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
+      <Route path="cart" element={<RoleRoute roles={['USER']}><CartPage /></RoleRoute>} />
+      <Route path="checkout" element={<RoleRoute roles={['USER']}><CheckoutPage /></RoleRoute>} />
 
       {/* Staff Dashboard */}
-      <Route path="staff" element={<RoleRoute roles={['ADMIN','STAFF']}><StaffLayout /></RoleRoute>}>
+      <Route path="staff" element={<RoleRoute roles={['STAFF']}><StaffLayout /></RoleRoute>}>
         <Route index element={<StaffDashboard />} />
         <Route path="books" element={<StaffBooks />} />
         <Route path="books/new" element={<StaffBookForm />} />
@@ -93,6 +93,7 @@ function AppRoutes() {
         <Route path="categories" element={<StaffCategories />} />
         <Route path="publishers" element={<StaffPublishers />} />
         <Route path="orders" element={<StaffOrders />} />
+        <Route path="profile" element={<MyProfile />} />
       </Route>
 
       {/* Admin Dashboard */}
@@ -106,6 +107,7 @@ function AppRoutes() {
         <Route path="publishers" element={<StaffPublishers />} />
         <Route path="orders" element={<StaffOrders />} />
         <Route path="settings" element={<AdminSettings />} />
+        <Route path="profile" element={<MyProfile />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

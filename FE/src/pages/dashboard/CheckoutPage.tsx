@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSettings } from '../../contexts/SettingsContext';
 import api, { getImageUrl } from '../../api/axios';
 import { LockClosedIcon, ShieldCheckIcon, DocumentTextIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
@@ -9,6 +10,7 @@ import toast from 'react-hot-toast';
 const CheckoutPage: React.FC = () => {
   const { cart, fetchCart } = useCart();
   const { user } = useAuth();
+  const { formatCurrency } = useSettings();
   const navigate = useNavigate();
 
   const [address, setAddress] = useState((user as any)?.address || '');
@@ -110,7 +112,7 @@ const CheckoutPage: React.FC = () => {
                   <div className="flex-1 text-sm pt-1">
                     <p className="font-bold leading-tight line-clamp-2 text-slate-900 mb-1">{item.book.title}</p>
                     <p className="text-slate-500 mb-1">Qty: {item.quantity}</p>
-                    <p className="font-semibold text-slate-900">${(item.book.price * item.quantity).toFixed(2)}</p>
+                    <p className="font-semibold text-slate-900">{formatCurrency(item.book.price * item.quantity)}</p>
                   </div>
                 </div>
               ))}
@@ -119,20 +121,20 @@ const CheckoutPage: React.FC = () => {
             <div className="space-y-4 text-sm font-medium border-t border-slate-100 pt-6">
               <div className="flex justify-between">
                 <span className="text-slate-500">Subtotal</span>
-                <span className="text-slate-900">${total.toFixed(2)}</span>
+                <span className="text-slate-900">{formatCurrency(total)}</span>
               </div>
               <div className="flex justify-between items-center">
                 <div className="flex flex-col">
                   <span className="text-slate-500">Shipping Estimate</span>
                   <span className="text-xs text-slate-400 font-normal">{(totalWeight / 1000).toFixed(2)} kg @ $5.00/kg (min $1)</span>
                 </div>
-                <span className="text-slate-900">${shippingCost.toFixed(2)}</span>
+                <span className="text-slate-900">{formatCurrency(shippingCost)}</span>
               </div>
               
               <div className="border-t border-slate-200 pt-4 mt-2">
                 <div className="flex justify-between items-center text-xl font-black text-slate-900">
                   <span>Grand Total</span>
-                  <span>${grandTotal.toFixed(2)}</span>
+                  <span>{formatCurrency(grandTotal)}</span>
                 </div>
               </div>
             </div>

@@ -3,9 +3,11 @@ import { Link, useSearchParams } from 'react-router-dom';
 import api, { getImageUrl } from '../../api/axios';
 import type { Book, PageResponse } from '../../types';
 import toast from 'react-hot-toast';
+import { useSettings } from '../../contexts/SettingsContext';
 import { PlusIcon, PencilIcon, TrashIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 const StaffBooks: React.FC = () => {
+  const { formatCurrency } = useSettings();
   const [params, setParams] = useSearchParams();
   const page = parseInt(params.get('page') || '0');
   const search = params.get('q') || '';
@@ -56,7 +58,7 @@ const StaffBooks: React.FC = () => {
             <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input name="q" defaultValue={search} placeholder="Search title or ISBN..." className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 text-sm" />
           </form>
-          <Link to="/staff/books/new" className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 flex items-center justify-center gap-2 whitespace-nowrap shadow-sm">
+          <Link to="new" className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 flex items-center justify-center gap-2 whitespace-nowrap shadow-sm">
             <PlusIcon className="w-4 h-4" /> Add Book
           </Link>
         </div>
@@ -93,13 +95,13 @@ const StaffBooks: React.FC = () => {
                       <p className="text-xs text-gray-500 mt-1">{b.publisher?.name || '-'}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm font-bold text-gray-900">${b.price.toFixed(2)}</p>
+                      <p className="text-sm font-bold text-gray-900">{formatCurrency(b.price)}</p>
                       <p className={`text-xs mt-1 font-semibold ${b.stock <= 5 ? (b.stock===0?'text-red-600':'text-amber-600') : 'text-green-600'}`}>
                         {b.stock} in stock
                       </p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Link to={`/staff/books/${b.id}/edit`} className="inline-block p-2 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-lg transition-colors mr-2"><PencilIcon className="w-5 h-5"/></Link>
+                      <Link to={`${b.id}/edit`} className="inline-block p-2 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-lg transition-colors mr-2"><PencilIcon className="w-5 h-5"/></Link>
                       <button onClick={() => handleDelete(b.id)} className="inline-block p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"><TrashIcon className="w-5 h-5"/></button>
                     </td>
                   </tr>

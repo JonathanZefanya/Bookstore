@@ -63,18 +63,28 @@ const PublicLayout: React.FC = () => {
 
               {isAuthenticated ? (
                 <>
-                  <Link to="/dashboard" className="text-sm text-gray-600 hover:text-indigo-600 font-medium flex items-center gap-1">
-                    <UserCircleIcon className="w-5 h-5" />
-                    {user?.name}
-                  </Link>
-                  <Link to="/cart" className="relative p-2 text-gray-600 hover:text-indigo-600">
-                    <ShoppingCartIcon className="w-6 h-6" />
-                    {cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                        {cartCount > 9 ? '9+' : cartCount}
-                      </span>
-                    )}
-                  </Link>
+                  {!isAdmin && !isStaff && (
+                    <>
+                      <Link to="/dashboard" className="text-sm text-gray-600 hover:text-indigo-600 font-medium flex items-center gap-1">
+                        <UserCircleIcon className="w-5 h-5" />
+                        {user?.name}
+                      </Link>
+                      <Link to="/cart" className="relative p-2 text-gray-600 hover:text-indigo-600">
+                        <ShoppingCartIcon className="w-6 h-6" />
+                        {cartCount > 0 && (
+                          <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                            {cartCount > 9 ? '9+' : cartCount}
+                          </span>
+                        )}
+                      </Link>
+                    </>
+                  )}
+                  {(isAdmin || isStaff) && (
+                    <div className="text-sm text-gray-600 font-medium flex items-center gap-1 border-l pl-4 border-gray-200">
+                      <UserCircleIcon className="w-5 h-5" />
+                      {user?.name}
+                    </div>
+                  )}
                   <button onClick={logout} className="text-sm text-gray-500 hover:text-red-500 transition-colors">Logout</button>
                 </>
               ) : (
@@ -108,11 +118,15 @@ const PublicLayout: React.FC = () => {
             <Link to="/books" className="block text-gray-700 font-medium py-1" onClick={() => setMobileOpen(false)}>Books</Link>
             {isAuthenticated ? (
               <>
-                <Link to="/dashboard" className="block text-gray-700 font-medium py-1" onClick={() => setMobileOpen(false)}>Dashboard</Link>
-                <Link to="/cart" className="block text-gray-700 font-medium py-1" onClick={() => setMobileOpen(false)}>Cart ({cartCount})</Link>
-                {isAdmin && <Link to="/admin" className="block text-red-600 font-medium py-1" onClick={() => setMobileOpen(false)}>Admin</Link>}
-                {isStaff && !isAdmin && <Link to="/staff" className="block text-amber-600 font-medium py-1" onClick={() => setMobileOpen(false)}>Staff</Link>}
-                <button onClick={() => { logout(); setMobileOpen(false); }} className="block text-red-500 font-medium py-1 text-left w-full">Logout</button>
+                {!isAdmin && !isStaff && (
+                  <>
+                    <Link to="/dashboard" className="block text-gray-700 font-medium py-1" onClick={() => setMobileOpen(false)}>Dashboard</Link>
+                    <Link to="/cart" className="block text-gray-700 font-medium py-1" onClick={() => setMobileOpen(false)}>Cart ({cartCount})</Link>
+                  </>
+                )}
+                {isAdmin && <Link to="/admin" className="block text-red-600 font-medium py-1" onClick={() => setMobileOpen(false)}>Admin Panel</Link>}
+                {isStaff && !isAdmin && <Link to="/staff" className="block text-amber-600 font-medium py-1" onClick={() => setMobileOpen(false)}>Staff Panel</Link>}
+                <button onClick={() => { logout(); setMobileOpen(false); }} className="block text-red-500 font-medium py-1 text-left w-full border-t border-gray-100 mt-2 pt-2">Logout</button>
               </>
             ) : (
               <>

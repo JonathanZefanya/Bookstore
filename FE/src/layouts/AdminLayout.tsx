@@ -48,7 +48,7 @@ const AdminLayout: React.FC = () => {
         ))}
       </nav>
       <div className="p-4 border-t border-slate-800 bg-slate-950">
-        <div className="flex items-center gap-3 mb-3">
+        <Link to="/admin/profile" className="flex items-center gap-3 mb-3 hover:bg-slate-800 p-2 -mx-2 rounded-lg transition-colors">
           <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center text-indigo-400 font-bold text-sm">
             {user?.name?.charAt(0).toUpperCase()}
           </div>
@@ -56,7 +56,7 @@ const AdminLayout: React.FC = () => {
             <p className="text-sm font-semibold truncate text-white">{user?.name}</p>
             <p className="text-xs text-indigo-400 font-medium">Administrator</p>
           </div>
-        </div>
+        </Link>
         <Link to="/" className="text-xs text-slate-500 hover:text-slate-300 block mb-2 transition-colors">← Public Site</Link>
         <button onClick={handleLogout} className="flex items-center gap-2 text-sm text-slate-400 hover:text-red-400 transition-colors w-full">
           <ArrowRightOnRectangleIcon className="w-4 h-4" /> Logout

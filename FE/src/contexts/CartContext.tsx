@@ -18,12 +18,12 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | null>(null);
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isStaff, isAdmin } = useAuth();
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(false);
 
   const fetchCart = async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || isStaff || isAdmin) return;
     try {
       const res = await api.get<{ data: Cart }>('/user/cart');
       setCart(res.data.data);
@@ -31,11 +31,15 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   useEffect(() => {
-    if (isAuthenticated) fetchCart();
+    if (isAuthenticated && !isStaff && !isAdmin) fetchCart();
     else setCart(null);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isStaff, isAdmin]);
 
   const addToCart = async (bookId: number, quantity = 1) => {
+    if (isStaff || isAdmin) {
+      toast.error('Staff and Admin cannot add items to cart.');
+      return;
+    }
     setLoading(true);
     try {
       const res = await api.post<{ data: Cart }>('/user/cart/add', { bookId, quantity });

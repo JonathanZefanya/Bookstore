@@ -4,6 +4,7 @@ import type { Book, Review } from '../../types';
 import api, { getImageUrl } from '../../api/axios';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSettings } from '../../contexts/SettingsContext';
 import { StarIcon, ShoppingCartIcon, BuildingOfficeIcon, UserIcon, IdentificationIcon, BookOpenIcon, ScaleIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolid } from '@heroicons/react/24/solid';
 import toast from 'react-hot-toast';
@@ -16,7 +17,8 @@ const BookDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
   const { addToCart, loading: cartLoading } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isStaff, isAdmin } = useAuth();
+  const { formatCurrency } = useSettings();
   
   // Review form
   const [rating, setRating] = useState(5);
@@ -134,26 +136,28 @@ const BookDetailPage: React.FC = () => {
               </p>
 
               <div className="flex items-baseline gap-4 mb-8 pb-8 border-b border-slate-200">
-                <span className="text-4xl font-black text-slate-900">${book.price.toFixed(2)}</span>
+                <span className="text-4xl font-black text-slate-900">{formatCurrency(book.price)}</span>
                 <span className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">{book.stock} in stock</span>
               </div>
 
               {/* Add to Cart Actions */}
-              <div className="flex flex-col sm:flex-row gap-4 items-center">
-                <div className="flex items-center border-2 border-slate-200 rounded-xl bg-white overflow-hidden h-14 w-full sm:w-auto">
-                  <button type="button" onClick={() => setQty(Math.max(1, qty - 1))} className="px-5 h-full text-slate-500 hover:bg-slate-50 hover:text-slate-900 border-r border-slate-200 font-bold font-mono text-lg transition-colors">-</button>
-                  <input type="number" value={qty} min="1" max={book.stock} readOnly className="w-16 h-full text-center font-bold text-slate-900 focus:outline-none bg-transparent" />
-                  <button type="button" onClick={() => setQty(Math.min(book.stock, qty + 1))} className="px-5 h-full text-slate-500 hover:bg-slate-50 hover:text-slate-900 border-l border-slate-200 font-bold font-mono text-lg transition-colors">+</button>
+              {(!isAuthenticated || (!isAdmin && !isStaff)) && (
+                <div className="flex flex-col sm:flex-row gap-4 items-center">
+                  <div className="flex items-center border-2 border-slate-200 rounded-xl bg-white overflow-hidden h-14 w-full sm:w-auto">
+                    <button type="button" onClick={() => setQty(Math.max(1, qty - 1))} className="px-5 h-full text-slate-500 hover:bg-slate-50 hover:text-slate-900 border-r border-slate-200 font-bold font-mono text-lg transition-colors">-</button>
+                    <input type="number" value={qty} min="1" max={book.stock} readOnly className="w-16 h-full text-center font-bold text-slate-900 focus:outline-none bg-transparent" />
+                    <button type="button" onClick={() => setQty(Math.min(book.stock, qty + 1))} className="px-5 h-full text-slate-500 hover:bg-slate-50 hover:text-slate-900 border-l border-slate-200 font-bold font-mono text-lg transition-colors">+</button>
+                  </div>
+                  <button
+                    onClick={handleAddCart}
+                    disabled={book.stock === 0 || cartLoading}
+                    className="w-full sm:w-auto flex-1 h-14 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none flex items-center justify-center gap-3 text-lg"
+                  >
+                    <ShoppingCartIcon className="w-6 h-6" />
+                    {book.stock === 0 ? 'Out of Stock' : 'Add to Cart — ' + formatCurrency(book.price * qty)}
+                  </button>
                 </div>
-                <button
-                  onClick={handleAddCart}
-                  disabled={book.stock === 0 || cartLoading}
-                  className="w-full sm:w-auto flex-1 h-14 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none flex items-center justify-center gap-3 text-lg"
-                >
-                  <ShoppingCartIcon className="w-6 h-6" />
-                  {book.stock === 0 ? 'Out of Stock' : 'Add to Cart — $' + (book.price * qty).toFixed(2)}
-                </button>
-              </div>
+              )}
 
             </div>
           </div>

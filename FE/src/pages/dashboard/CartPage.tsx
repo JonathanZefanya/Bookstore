@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
+import { useSettings } from '../../contexts/SettingsContext';
 import { TrashIcon, ShoppingCartIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { getImageUrl } from '../../api/axios';
 
 const CartPage: React.FC = () => {
   const { cart, loading, updateQuantity, removeFromCart, clearCart } = useCart();
+  const { formatCurrency } = useSettings();
   const navigate = useNavigate();
+  const [isClearModalOpen, setIsClearModalOpen] = useState(false);
 
   const total = cart?.items.reduce((sum, item) => sum + (item.quantity * item.book.price), 0) || 0;
   const weight = cart?.items.reduce((sum, item) => sum + (item.quantity * (item.book.weightGram || 0)), 0) || 0;
@@ -44,7 +47,7 @@ const CartPage: React.FC = () => {
           <ShoppingCartIcon className="w-8 h-8 text-indigo-600" />
           Shopping Cart
         </h1>
-        <button onClick={() => { if(window.confirm('Clear your entire cart?')) clearCart(); }} className="text-sm font-medium text-red-500 hover:text-red-700 hover:underline">
+        <button onClick={() => setIsClearModalOpen(true)} className="text-sm font-medium text-red-500 hover:text-red-700 hover:underline">
           Clear Cart
         </button>
       </div>
@@ -65,10 +68,10 @@ const CartPage: React.FC = () => {
                         <h3 className="text-lg font-bold text-gray-900 leading-tight pr-4">
                           <Link to={`/books/${item.book.slug}`} className="hover:text-indigo-600 transition-colors">{item.book.title}</Link>
                         </h3>
-                        <p className="text-lg font-black text-gray-900">${(item.book.price * item.quantity).toFixed(2)}</p>
+                        <p className="text-lg font-black text-gray-900">{formatCurrency(item.book.price * item.quantity)}</p>
                       </div>
                       <p className="text-sm text-gray-500 mt-1">{item.book.author}</p>
-                      <p className="text-xs text-gray-400 mt-2 font-mono bg-gray-100 inline-block px-2 py-1 rounded">Unit: ${item.book.price.toFixed(2)}</p>
+                      <p className="text-xs text-gray-400 mt-2 font-mono bg-gray-100 inline-block px-2 py-1 rounded">Unit: {formatCurrency(item.book.price)}</p>
                     </div>
                     
                     <div className="flex items-center justify-between mt-4">
@@ -104,7 +107,7 @@ const CartPage: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="text-gray-900 font-bold">${total.toFixed(2)}</span>
+                <span className="text-gray-900 font-bold">{formatCurrency(total)}</span>
               </div>
               <div className="flex justify-between items-center text-xs">
                 <span className="text-gray-500">Total Weight Est.</span>
@@ -114,7 +117,7 @@ const CartPage: React.FC = () => {
             <div className="border-t border-gray-100 pt-4 mb-8">
               <div className="flex justify-between items-baseline mb-1">
                 <span className="font-bold text-gray-900">Total Estimate</span>
-                <span className="text-2xl font-black text-gray-900">${total.toFixed(2)}</span>
+                <span className="text-2xl font-black text-gray-900">{formatCurrency(total)}</span>
               </div>
               <p className="text-xs text-gray-500 text-right">Shipping calculated at checkout</p>
             </div>
@@ -131,6 +134,35 @@ const CartPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Clear Cart Modal */}
+      {isClearModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform transition-all scale-100">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Clear Cart</h3>
+            <p className="text-gray-500 mb-6 text-sm">Are you sure you want to remove all items from your cart? This action cannot be undone.</p>
+            <div className="flex gap-3 justify-end">
+              <button 
+                onClick={() => setIsClearModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                disabled={loading}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  clearCart();
+                  setIsClearModalOpen(false);
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center justify-center min-w-[5rem]"
+                disabled={loading}
+              >
+                {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : 'Clear All'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

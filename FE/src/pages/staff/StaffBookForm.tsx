@@ -40,7 +40,7 @@ const StaffBookForm: React.FC = () => {
         });
         setExistingCoverUrl(b.coverImage || null);
       }).catch(() => {
-        toast.error('Book not found'); navigate('/staff/books');
+        toast.error('Book not found'); navigate('..', { relative: 'path' });
       }).finally(() => setLoading(false));
     }
   }, [id]);
@@ -65,7 +65,7 @@ const StaffBookForm: React.FC = () => {
         await api.post('/books', fd, config);
         toast.success('Book created successfully!');
       }
-      navigate('/staff/books');
+      navigate('..', { relative: 'path' });
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to save book');
     } finally {
@@ -79,7 +79,7 @@ const StaffBookForm: React.FC = () => {
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">{isEdit ? 'Edit Book' : 'Add New Book'}</h1>
-        <button onClick={() => navigate('/staff/books')} className="text-sm font-medium text-gray-500 hover:text-gray-900">Cancel</button>
+        <button onClick={() => navigate('..', { relative: 'path' })} className="text-sm font-medium text-gray-500 hover:text-gray-900">Cancel</button>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -143,7 +143,7 @@ const StaffBookForm: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Price (USD) *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Price *</label>
               <input required type="number" step="0.01" min="0" value={form.price} onChange={e=>setForm({...form, price: parseFloat(e.target.value)})} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 py-2.5" />
             </div>
 
@@ -171,7 +171,7 @@ const StaffBookForm: React.FC = () => {
         
         <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-4 items-center">
           <p className="text-xs text-gray-500 italic mr-auto">Please double check all information before saving</p>
-          <button type="button" onClick={() => navigate('/staff/books')} className="px-5 py-2.5 font-bold text-gray-600 hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
+          <button type="button" onClick={() => navigate('..', { relative: 'path' })} className="px-5 py-2.5 font-bold text-gray-600 hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
           <button type="submit" disabled={saving} className="px-8 py-2.5 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 transition-colors">
             {saving ? 'Saving...' : 'Save Book Info'}
           </button>
