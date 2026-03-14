@@ -13,7 +13,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/settings")
-@CrossOrigin(origins = "*")
+
 public class SettingsController {
 
     @Autowired private SettingsService settingsService;

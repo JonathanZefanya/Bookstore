@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useSettings } from '../contexts/SettingsContext';
 import {
-  HomeIcon, ShoppingBagIcon, UserIcon, Bars3Icon, XMarkIcon, ArrowRightOnRectangleIcon,
+  HomeIcon, ShoppingBagIcon, UserIcon, Bars3Icon, ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline';
 
 const navLinks = [
@@ -13,6 +14,7 @@ const navLinks = [
 
 const DashboardLayout: React.FC = () => {
   const { user, logout } = useAuth();
+  const { settings } = useSettings();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -22,8 +24,10 @@ const DashboardLayout: React.FC = () => {
     <div className="flex flex-col h-full">
       <div className="p-6 border-b border-gray-100">
         <Link to="/" className="flex items-center gap-2 font-bold text-lg text-indigo-600">
-          <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-xs font-black">G</div>
-          Gramedia
+          <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-xs font-black">
+            {(settings?.siteName || 'G').charAt(0).toUpperCase()}
+          </div>
+          {settings?.siteName || 'Gramedia'}
         </Link>
         <p className="text-xs text-gray-500 mt-1 font-medium uppercase tracking-wide">My Account</p>
       </div>

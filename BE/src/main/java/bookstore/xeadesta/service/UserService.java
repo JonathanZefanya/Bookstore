@@ -36,6 +36,28 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User adminUpdateUser(Long id, User update) {
+        User user = getUserById(id);
+        if (update.getName() != null && !update.getName().isBlank()) {
+            user.setName(update.getName());
+        }
+        if (update.getEmail() != null && !update.getEmail().isBlank() && !update.getEmail().equals(user.getEmail())) {
+            if (userRepository.existsByEmail(update.getEmail())) {
+                throw new IllegalArgumentException("Email is already registered by another user");
+            }
+            user.setEmail(update.getEmail());
+        }
+        if (update.getPhone() != null) user.setPhone(update.getPhone());
+        if (update.getAddress() != null) user.setAddress(update.getAddress());
+        if (update.getPassword() != null && !update.getPassword().isBlank()) {
+            if (update.getPassword().length() < 8) {
+                throw new IllegalArgumentException("New password must be at least 8 characters");
+            }
+            user.setPassword(passwordEncoder.encode(update.getPassword()));
+        }
+        return userRepository.save(user);
+    }
+
     public User changePassword(Long id, String oldPassword, String newPassword) {
         User user = getUserById(id);
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "*")
+
 public class UserController {
 
     @Autowired private UserService userService;
@@ -54,23 +54,45 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(userService.getUserById(id)));
     }
 
+    @PutMapping("/api/admin/users/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<User>> adminUpdateUser(
+            @PathVariable Long id,
+            @RequestBody User update) {
+        return ResponseEntity.ok(ApiResponse.success("User updated", userService.adminUpdateUser(id, update)));
+    }
+
     @PatchMapping("/api/admin/users/{id}/role")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<User>> updateRole(
             @PathVariable Long id,
-            @RequestBody Map<String, String> body) {
+            @RequestBody Map<String, String> body,
+            @AuthenticationPrincipal CustomUserDetails currentUser) {
+        if (currentUser.getId().equals(id)) {
+            throw new IllegalArgumentException("You cannot change your own role");
+        }
         return ResponseEntity.ok(ApiResponse.success("Role updated", userService.updateUserRole(id, body.get("role"))));
     }
 
     @PatchMapping("/api/admin/users/{id}/toggle")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<User>> toggleActive(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<User>> toggleActive(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails currentUser) {
+        if (currentUser.getId().equals(id)) {
+            throw new IllegalArgumentException("You cannot disable your own account");
+        }
         return ResponseEntity.ok(ApiResponse.success("User status toggled", userService.toggleUserActive(id)));
     }
 
     @DeleteMapping("/api/admin/users/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteUser(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails currentUser) {
+        if (currentUser.getId().equals(id)) {
+            throw new IllegalArgumentException("You cannot delete your own account");
+        }
         userService.deleteUser(id);
         return ResponseEntity.ok(ApiResponse.success("User deleted", null));
     }

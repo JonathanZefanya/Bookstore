@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useSettings } from '../contexts/SettingsContext';
+import { getImageUrl } from '../api/axios';
 import { ShoppingCartIcon, Bars3Icon, XMarkIcon, MagnifyingGlassIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 
 const PublicLayout: React.FC = () => {
   const { isAuthenticated, user, logout, isAdmin, isStaff } = useAuth();
   const { cartCount } = useCart();
+  const { settings } = useSettings();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
@@ -27,8 +30,14 @@ const PublicLayout: React.FC = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 font-bold text-xl text-indigo-600">
-              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-sm font-black">G</div>
-              Gramedia
+              {settings?.siteLogo ? (
+                <img src={getImageUrl(settings.siteLogo)!} alt="Logo" className="w-8 h-8 rounded-lg object-contain" />
+              ) : (
+                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-sm font-black">
+                  {(settings?.siteName || 'G').charAt(0).toUpperCase()}
+                </div>
+              )}
+              {settings?.siteName || 'Gramedia'}
             </Link>
 
             {/* Search */}
@@ -126,11 +135,17 @@ const PublicLayout: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 font-bold text-xl mb-3">
-                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-sm font-black">G</div>
-                Gramedia Bookstore
+                {settings?.siteLogo ? (
+                  <img src={getImageUrl(settings.siteLogo)!} alt="Logo" className="w-8 h-8 rounded-lg object-contain bg-white" />
+                ) : (
+                  <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-sm font-black text-white">
+                    {(settings?.siteName || 'G').charAt(0).toUpperCase()}
+                  </div>
+                )}
+                {settings?.siteName || 'Gramedia Bookstore'}
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Your trusted online bookstore with thousands of titles across all genres.
+              <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap">
+                {settings?.footerText || 'Your trusted online bookstore with thousands of titles across all genres.'}
               </p>
             </div>
             <div>
@@ -151,7 +166,7 @@ const PublicLayout: React.FC = () => {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-10 pt-6 text-center text-gray-500 text-sm">
-            © 2025 Gramedia Bookstore. All rights reserved.
+            © {new Date().getFullYear()} {settings?.siteName || 'Gramedia Bookstore'}. All rights reserved.
           </div>
         </div>
       </footer>

@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user/cart")
-@CrossOrigin(origins = "*")
+
 public class CartController {
 
     @Autowired private CartService cartService;

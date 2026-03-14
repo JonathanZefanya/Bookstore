@@ -1,0 +1,5 @@
+# Backend API Configuration
+VITE_API_URL=http://localhost:8080/api
+
+# Uploads Directory URL
+VITE_UPLOADS_URL=http://localhost:8080/uploads/

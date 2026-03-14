@@ -1,9 +1,10 @@
-import React, { lazy, Suspense } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
-
+import { SettingsProvider } from './contexts/SettingsContext';
+import { HelmetProvider } from 'react-helmet-async';
 // Layouts
 import PublicLayout from './layouts/PublicLayout';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -38,13 +39,6 @@ import StaffOrders from './pages/staff/StaffOrders';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminSettings from './pages/admin/AdminSettings';
-
-// Loading
-const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-  </div>
-);
 
 // Route Guards
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -121,21 +115,25 @@ function AppRoutes() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <CartProvider>
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 3000,
-              style: { borderRadius: '8px', fontFamily: 'Inter, sans-serif' },
-              success: { iconTheme: { primary: '#4f46e5', secondary: '#fff' } },
-            }}
-          />
-          <AppRoutes />
-        </CartProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <HelmetProvider>
+      <SettingsProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <CartProvider>
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 3000,
+                  style: { borderRadius: '8px', fontFamily: 'Inter, sans-serif' },
+                  success: { iconTheme: { primary: '#4f46e5', secondary: '#fff' } },
+                }}
+              />
+              <AppRoutes />
+            </CartProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </SettingsProvider>
+    </HelmetProvider>
   );
 }
 

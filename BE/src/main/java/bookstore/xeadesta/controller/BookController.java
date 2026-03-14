@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/books")
-@CrossOrigin(origins = "*")
+
 public class BookController {
 
     @Autowired private BookService bookService;

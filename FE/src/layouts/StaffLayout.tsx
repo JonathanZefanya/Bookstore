@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useSettings } from '../contexts/SettingsContext';
 import {
   HomeIcon, BookOpenIcon, TagIcon, BuildingOfficeIcon, ClipboardDocumentListIcon,
   Bars3Icon, ArrowRightOnRectangleIcon,
@@ -16,6 +17,7 @@ const navLinks = [
 
 const StaffLayout: React.FC = () => {
   const { user, logout } = useAuth();
+  const { settings } = useSettings();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -28,7 +30,7 @@ const StaffLayout: React.FC = () => {
           <div className="w-7 h-7 bg-amber-600 rounded-lg flex items-center justify-center text-white text-xs font-black">S</div>
           Staff Panel
         </Link>
-        <p className="text-xs text-amber-600 mt-1 font-medium">Gramedia Bookstore</p>
+        <p className="text-xs text-amber-600 mt-1 font-medium">{settings?.siteName || 'Gramedia Bookstore'}</p>
       </div>
       <nav className="flex-1 p-4 space-y-1">
         {navLinks.map(({ to, label, icon: Icon, end }) => (

@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/publishers")
-@CrossOrigin(origins = "*")
+
 public class PublisherController {
 
     @Autowired private PublisherRepository publisherRepository;

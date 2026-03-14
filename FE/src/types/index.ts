@@ -90,6 +90,7 @@ export interface Settings {
   siteLogo?: string;
   siteFavicon?: string;
   themeColor?: string;
+  currency?: string;
   footerText?: string;
   metaTitle?: string;
   metaDescription?: string;

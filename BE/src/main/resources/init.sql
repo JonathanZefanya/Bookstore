@@ -123,6 +123,7 @@ CREATE TABLE IF NOT EXISTS settings (
   site_logo VARCHAR(500),
   site_favicon VARCHAR(500),
   theme_color VARCHAR(7) DEFAULT '#4f46e5',
+  currency VARCHAR(10) DEFAULT 'IDR',
   footer_text TEXT,
   meta_title VARCHAR(255),
   meta_description TEXT,
@@ -135,15 +136,10 @@ CREATE TABLE IF NOT EXISTS settings (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Seed default admin
-INSERT INTO users (name, email, password, role, is_active)
-SELECT 'Admin', 'admin@bookstore.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBaIjnrdBbKwES', 'ADMIN', TRUE
-WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin@bookstore.com');
--- password = "password123"
-
 -- Seed default settings
-INSERT INTO settings (site_name, theme_color, footer_text)
-SELECT 'Gramedia Bookstore', '#4f46e5', '© 2025 Gramedia Bookstore. All rights reserved.'
+INSERT INTO settings (site_name, theme_color, currency, footer_text)
+SELECT 'Gramedia Bookstore', '#4f46e5', 'IDR', '© 2025 Gramedia Bookstore. All rights reserved.'
+FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM settings);
 
 -- Seed categories

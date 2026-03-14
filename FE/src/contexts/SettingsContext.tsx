@@ -1,125 +1,72 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios, { AxiosError } from 'axios';
-
-export interface Settings {
-  id?: number;
-  siteName?: string;
-  siteLogo?: string;
-  siteFavicon?: string;
-  themeColor?: string;
-  footerText?: string;
-  metaTitle?: string;
-  metaDescription?: string;
-  metaKeywords?: string;
-  ogTitle?: string;
-  ogDescription?: string;
-  ogImage?: string;
-  canonicalUrl?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
+import api, { getImageUrl } from '../api/axios';
+import type { Settings } from '../types';
 
 interface SettingsContextType {
   settings: Settings | null;
   loading: boolean;
-  error: string | null;
-  refreshSettings: () => Promise<void>;
-  updateSettings: (newSettings: Partial<Settings>) => Promise<Settings>;
-  uploadLogo: (file: File) => Promise<Settings>;
-  uploadFavicon: (file: File) => Promise<Settings>;
-  uploadOgImage: (file: File) => Promise<Settings>;
 }
 
-const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
+const SettingsContext = createContext<SettingsContextType>({ settings: null, loading: true });
 
-const defaultSettings: Settings = {
-  siteName: 'Bookstore',
-  themeColor: '#4f46e5',
-};
+export const useSettings = () => useContext(SettingsContext);
 
-function getErrorMessage(err: unknown): string {
-  if (err instanceof AxiosError) {
-    const data = err.response?.data;
-    if (data?.message) return data.message;
-    if (typeof data === 'string') return data;
-    return err.message;
-  }
-  if (err instanceof Error) return err.message;
-  return 'An unknown error occurred';
-}
-
-export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [settings, setSettings] = useState<Settings | null>(defaultSettings);
+export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8086/api';
-
-  const fetchSettings = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await axios.get(`${API_BASE_URL}/settings`, { timeout: 8000 });
-      setSettings(response.data || defaultSettings);
-    } catch (err) {
-      setSettings(defaultSettings);
-      console.warn('Using default settings. Backend may be offline:', getErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchSettings();
+    api.get<{ data: Settings }>('/settings')
+      .then(res => setSettings(res.data.data))
+      .catch((e) => console.error('Failed to load settings', e))
+      .finally(() => setLoading(false));
   }, []);
 
-  const refreshSettings = async () => {
-    await fetchSettings();
-  };
+  useEffect(() => {
+    if (!settings) return;
 
-  const updateSettings = async (newSettings: Partial<Settings>): Promise<Settings> => {
-    try {
-      setError(null);
-      const response = await axios.put(`${API_BASE_URL}/settings`, newSettings);
-      setSettings(response.data);
-      return response.data;
-    } catch (err) {
-      const message = getErrorMessage(err);
-      setError(message);
-      throw new Error(message);
+    // Dynamic style update for theme colour
+    if (settings.themeColor) {
+      document.documentElement.style.setProperty('--color-primary', settings.themeColor);
     }
-  };
 
-  const uploadFile = async (file: File, endpoint: string): Promise<Settings> => {
-    try {
-      setError(null);
-      const formData = new FormData();
-      formData.append('file', file);
-      const response = await axios.post(`${API_BASE_URL}/settings/${endpoint}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      setSettings(response.data);
-      return response.data;
-    } catch (err) {
-      const message = getErrorMessage(err);
-      setError(message);
-      throw new Error(message);
+    // Explicitly update document base title
+    document.title = settings.metaTitle || settings.siteName || 'Gramedia Bookstore';
+
+    // Explicitly update favicon
+    if (settings.siteFavicon) {
+      let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = getImageUrl(settings.siteFavicon) || '/favicon.svg';
     }
-  };
+  }, [settings]);
 
-  const uploadLogo = (file: File) => uploadFile(file, 'upload-logo');
-  const uploadFavicon = (file: File) => uploadFile(file, 'upload-favicon');
-  const uploadOgImage = (file: File) => uploadFile(file, 'upload-og-image');
+
 
   return (
-    <SettingsContext.Provider value={{ settings, loading, error, refreshSettings, updateSettings, uploadLogo, uploadFavicon, uploadOgImage }}>
+    <SettingsContext.Provider value={{ settings, loading }}>
+      {settings && (
+        <Helmet>
+          <title>{settings.metaTitle || settings.siteName || 'Gramedia Bookstore'}</title>
+          {settings.metaDescription && <meta name="description" content={settings.metaDescription} />}
+          {settings.metaKeywords && <meta name="keywords" content={settings.metaKeywords} />}
+          
+          {settings.siteName && <meta property="og:site_name" content={settings.siteName} />}
+          {settings.ogTitle && <meta property="og:title" content={settings.ogTitle} />}
+          {settings.ogDescription && <meta property="og:description" content={settings.ogDescription} />}
+          {settings.ogImage ? <meta property="og:image" content={getImageUrl(settings.ogImage)!} /> : null}
+          {settings.canonicalUrl && <link rel="canonical" href={settings.canonicalUrl} />}
+          
+          {settings.siteFavicon ? <link rel="icon" href={getImageUrl(settings.siteFavicon)!} /> : null}
+          {settings.themeColor && <meta name="theme-color" content={settings.themeColor} />}
+        </Helmet>
+      )}
       {children}
     </SettingsContext.Provider>
   );
-};
-
-export const useSettings = () => {
-  const context = useContext(SettingsContext);
-  if (!context) throw new Error('useSettings must be used within a SettingsProvider');
-  return context;
 };

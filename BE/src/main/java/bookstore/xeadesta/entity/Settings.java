@@ -28,6 +28,9 @@ public class Settings {
     @Column
     private String themeColor;
 
+    @Column
+    private String currency;
+
     @Column(columnDefinition = "TEXT")
     private String footerText;
 
