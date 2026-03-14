@@ -4,103 +4,69 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.InputStream;
+import java.nio.file.*;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class FileUploadService {
-    
-    @Value("${file.upload-dir:uploads/}")
+
+    @Value("${file.upload-dir}")
     private String uploadDir;
-    
-    @Value("${file.max-size:2097152}")
-    private long maxFileSize;
-    
-    @Value("${file.allowed-types:png,jpg,jpeg,webp,ico}")
-    private String allowedTypes;
-    
-    private static final Set<String> ALLOWED_MIME_TYPES = new HashSet<>(Arrays.asList(
-            "image/png",
-            "image/jpeg",
-            "image/webp",
-            "image/x-icon"
-    ));
-    
-    public String uploadFile(MultipartFile file) throws IllegalArgumentException, IOException {
-        if (file.isEmpty()) {
+
+    private static final List<String> ALLOWED_IMAGE_TYPES =
+        List.of("image/jpeg", "image/png", "image/webp", "image/gif");
+
+    private static final List<String> ALLOWED_BRANDING_TYPES =
+        List.of("image/jpeg", "image/png", "image/webp", "image/x-icon");
+
+    private static final long MAX_SIZE = 5L * 1024 * 1024; // 5 MB
+
+    public String uploadBookCover(MultipartFile file) throws IOException {
+        return upload(file, "books", ALLOWED_IMAGE_TYPES);
+    }
+
+    public String uploadBranding(MultipartFile file) throws IOException {
+        return upload(file, "branding", ALLOWED_BRANDING_TYPES);
+    }
+
+    private String upload(MultipartFile file, String subDir, List<String> allowedTypes) throws IOException {
+        if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("File is empty");
         }
-        
-        // Validate file size
-        if (file.getSize() > maxFileSize) {
-            throw new IllegalArgumentException("File size exceeds maximum limit of 2 MB");
+        if (file.getSize() > MAX_SIZE) {
+            throw new IllegalArgumentException("File size must be less than 5 MB");
         }
-        
-        // Validate MIME type
-        String mimeType = file.getContentType();
-        if (mimeType == null || !ALLOWED_MIME_TYPES.contains(mimeType)) {
-            throw new IllegalArgumentException("Invalid file type. Allowed types: " + allowedTypes);
+        String contentType = file.getContentType();
+        if (contentType == null || !allowedTypes.contains(contentType)) {
+            throw new IllegalArgumentException("Invalid file type: " + contentType);
         }
-        
-        // Validate file extension
-        String originalFilename = file.getOriginalFilename();
-        if (originalFilename == null) {
-            throw new IllegalArgumentException("Invalid file");
+
+        String ext = getExtension(file.getOriginalFilename());
+        String fileName = subDir + "/" + UUID.randomUUID() + "." + ext;
+
+        Path dirPath = Paths.get(uploadDir, subDir).toAbsolutePath().normalize();
+        Files.createDirectories(dirPath);
+
+        Path filePath = dirPath.resolve(UUID.randomUUID() + "." + ext);
+        fileName = subDir + "/" + filePath.getFileName().toString();
+
+        try (InputStream in = file.getInputStream()) {
+            Files.copy(in, filePath, StandardCopyOption.REPLACE_EXISTING);
         }
-        
-        String fileExtension = getFileExtension(originalFilename);
-        Set<String> allowedExtensions = new HashSet<>(Arrays.asList(allowedTypes.split(",")));
-        if (!allowedExtensions.contains(fileExtension.toLowerCase())) {
-            throw new IllegalArgumentException("Invalid file extension. Allowed: " + allowedTypes);
-        }
-        
-        // Generate secure random filename
-        String randomFileName = generateRandomFileName(fileExtension);
-        
-        // Create upload directory if it doesn't exist
-        File uploadDirectory = new File(uploadDir);
-        if (!uploadDirectory.exists()) {
-            uploadDirectory.mkdirs();
-        }
-        
-        // Save file
-        Path filePath = Paths.get(uploadDir, randomFileName);
-        Files.write(filePath, file.getBytes());
-        
-        return randomFileName;
+        return fileName;
     }
-    
+
     public void deleteFile(String fileName) throws IOException {
-        if (fileName == null || fileName.isEmpty()) {
-            return;
-        }
-        
-        Path filePath = Paths.get(uploadDir, fileName);
-        Files.deleteIfExists(filePath);
+        if (fileName == null || fileName.isBlank()) return;
+        Path path = Paths.get(uploadDir, fileName).toAbsolutePath().normalize();
+        Files.deleteIfExists(path);
     }
-    
-    private String getFileExtension(String fileName) {
-        int lastDotIndex = fileName.lastIndexOf('.');
-        return lastDotIndex > 0 ? fileName.substring(lastDotIndex + 1) : "";
-    }
-    
-    private String generateRandomFileName(String fileExtension) {
-        SecureRandom random = new SecureRandom();
-        byte[] values = new byte[16];
-        random.nextBytes(values);
-        
-        StringBuilder sb = new StringBuilder();
-        for (byte value : values) {
-            sb.append(String.format("%02x", value));
-        }
-        
-        return sb.toString() + "." + fileExtension;
+
+    private String getExtension(String filename) {
+        if (filename == null || !filename.contains(".")) return "jpg";
+        return filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
     }
 }

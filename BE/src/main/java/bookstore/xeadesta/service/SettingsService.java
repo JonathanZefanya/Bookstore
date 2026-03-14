@@ -79,7 +79,7 @@ public class SettingsService {
     
     public Settings uploadLogo(MultipartFile file) throws IOException {
         validateFile(file);
-        String fileName = fileUploadService.uploadFile(file);
+        String fileName = fileUploadService.uploadBranding(file);
         Settings settings = getOrCreateSettings();
         deleteFileIfExists(settings.getSiteLogo());
         settings.setSiteLogo(fileName);
@@ -88,7 +88,7 @@ public class SettingsService {
     
     public Settings uploadFavicon(MultipartFile file) throws IOException {
         validateFile(file);
-        String fileName = fileUploadService.uploadFile(file);
+        String fileName = fileUploadService.uploadBranding(file);
         Settings settings = getOrCreateSettings();
         deleteFileIfExists(settings.getSiteFavicon());
         settings.setSiteFavicon(fileName);
@@ -97,7 +97,7 @@ public class SettingsService {
     
     public Settings uploadOgImage(MultipartFile file) throws IOException {
         validateFile(file);
-        String fileName = fileUploadService.uploadFile(file);
+        String fileName = fileUploadService.uploadBranding(file);
         Settings settings = getOrCreateSettings();
         deleteFileIfExists(settings.getOgImage());
         settings.setOgImage(fileName);

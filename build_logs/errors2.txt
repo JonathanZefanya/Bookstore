@@ -1,0 +1,35 @@
+﻿[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------------< bookstore:xeadesta >-------------------------
+[INFO] Building xeadesta 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ xeadesta ---
+[INFO] Deleting C:\Users\Jonathan Zefanya\Dokumen\Bookstore\BE\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ xeadesta ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ xeadesta ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 51 source files with javac [debug parameters release 21] to target\classes
+[WARNING] /C:/Users/Jonathan Zefanya/Dokumen/Bookstore/BE/src/main/java/bookstore/xeadesta/entity/User.java:[38,18] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/Jonathan Zefanya/Dokumen/Bookstore/BE/src/main/java/bookstore/xeadesta/entity/User.java:[41,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/Jonathan Zefanya/Dokumen/Bookstore/BE/src/main/java/bookstore/xeadesta/entity/Order.java:[27,24] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/Jonathan Zefanya/Dokumen/Bookstore/BE/src/main/java/bookstore/xeadesta/entity/Order.java:[30,24] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/Jonathan Zefanya/Dokumen/Bookstore/BE/src/main/java/bookstore/xeadesta/entity/Order.java:[33,24] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/Jonathan Zefanya/Dokumen/Bookstore/BE/src/main/java/bookstore/xeadesta/entity/Order.java:[40,27] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/Jonathan Zefanya/Dokumen/Bookstore/BE/src/main/java/bookstore/xeadesta/entity/Order.java:[44,25] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/Jonathan Zefanya/Dokumen/Bookstore/BE/src/main/java/bookstore/xeadesta/entity/Book.java:[36,24] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/Jonathan Zefanya/Dokumen/Bookstore/BE/src/main/java/bookstore/xeadesta/entity/Book.java:[39,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/Jonathan Zefanya/Dokumen/Bookstore/BE/src/main/java/bookstore/xeadesta/entity/Book.java:[45,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/Jonathan Zefanya/Dokumen/Bookstore/BE/src/main/java/bookstore/xeadesta/entity/CartItem.java:[29,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/Jonathan Zefanya/Dokumen/Bookstore/BE/src/main/java/bookstore/xeadesta/entity/OrderItem.java:[28,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.972 s
+[INFO] Finished at: 2026-03-14T12:16:45+07:00
+[INFO] ------------------------------------------------------------------------
