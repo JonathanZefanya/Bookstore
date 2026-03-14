@@ -1,4 +1,4 @@
-# Gramedia-Style E-Commerce Bookstore
+# E-Commerce Bookstore
 
 Sebuah sistem informasi toko buku online terpadu (E-Commerce Web Application) berskala penuh yang dibangun dengan **Spring Boot (Java 21)** sebagai Backend API dan **React Vite (TypeScript)** sebagai Frontend Single-Page Application (SPA).
 
